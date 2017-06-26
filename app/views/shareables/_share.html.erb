@@ -1,0 +1,12 @@
+<li id="share_<%= share.id %>" class="list-group-item">
+  <%= fa_icon('share-alt') %> Shared with
+  <strong><%= share.shared_to.name %></strong>
+  <% if current_user && share.resource.editable_by?(current_user) %>
+    <%= link_to fa_icon('trash'), shareable_path(share), method: :delete, remote: true, class: 'pull-right' unless share.resource.editable_by?(share.shared_to) %>
+
+    <%= simple_form_for share, url: shareable_path(share), as: :shareable, remote: true do |f| %>
+      <%= f.input :edit, as: :boolean, label: 'can edit', input_html: { :onchange => "$(this.form).submit();", id: "shareable_edit_#{f.object.id}" }, disabled: (share.resource.record_creator == share.shared_to) %>
+      f.input :share_to_children, as: :boolean, label: 'share to children', input_html: { :onchange => "$(this.form).submit();"} if share.resource.class.method_defined?(:children) && share.resource.children.any? %>
+    <% end %>
+  <% end %>
+</li>

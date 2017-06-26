@@ -1,0 +1,1 @@
+$('#shares').append('<%= j render(partial: 'shareables/share', locals: {share: ShareModel.where(shared_to: @share_to, resource: @resource).first}) %>');

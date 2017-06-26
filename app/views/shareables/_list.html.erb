@@ -1,0 +1,27 @@
+<% shared = obj.shared_with.map{|w| [w.shared_to.name, [w.shared_to_type, w.shared_to_id]]} %>
+<% share_tos = User.all + Group.all %>
+<% options = share_tos.map{|o|[o.name, [o.class.name, o.id]]} - shared %>
+
+<div style="margin: 10px 0;">
+<%= form_tag shareables_path, remote: true, class: 'form-inline' do %>
+    <%= select_tag 'share_to', options_for_select(options), include_blank: true, style: 'width: 80%;' %>
+    <%= hidden_field_tag 'resource_id', obj.id %>
+    <%= hidden_field_tag 'resource_type', obj.class.name %>
+  <%= submit_tag 'Share', class: 'btn btn-primary pull-right' %>
+<% end %>
+</div>
+
+<ul id="shares" class="list-group">
+  <li id="share_record_creator" class="list-group-item">
+    <%= fa_icon('file') %> Created by
+    <strong><%= obj.record_creator.try(:name) %></strong>
+  </li>
+  <%= render partial: 'shareables/share', collection: obj.shared_with %>
+
+</ul>
+
+<script type="text/javascript">
+  $("#share_to").select2({
+    theme: 'bootstrap'
+  });
+</script>
