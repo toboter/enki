@@ -6,7 +6,7 @@
 
     <%= simple_form_for share, url: shareable_path(share), as: :shareable, remote: true do |f| %>
       <%= f.input :edit, as: :boolean, label: 'can edit', input_html: { :onchange => "$(this.form).submit();", id: "shareable_edit_#{f.object.id}" }, disabled: (share.resource.record_creator == share.shared_to) %>
-      f.input :share_to_children, as: :boolean, label: 'share to children', input_html: { :onchange => "$(this.form).submit();"} if share.resource.class.method_defined?(:children) && share.resource.children.any? %>
+      f.input :share_to_children, <!-- as: :boolean, label: 'share to children', input_html: { :onchange => "$(this.form).submit();"} if share.resource.class.method_defined?(:children) && share.resource.children.any? %> -->
     <% end %>
   <% end %>
 </li>

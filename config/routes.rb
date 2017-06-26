@@ -5,4 +5,12 @@ Rails.application.routes.draw do
       delete :remove_multiple
     end
   end
+
+  resources :record_activities, only: [] do
+    collection do
+      post :publish
+      delete :unpublish
+    end
+  end
+
 end

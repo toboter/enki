@@ -11,7 +11,7 @@ module Enki
       end
 
       def visible_for(user)
-        if user
+        if user # || published
           left_outer_joins(:shared_with).references(:share_models).where(share_models: {id: nil})
             .or(left_outer_joins(:shared_with).references(:share_models)
               .where(share_models: {shared_to_id: user.id, shared_to_type: 'User'}))
@@ -26,7 +26,7 @@ module Enki
     end
 
     included do
-      after_create :add_created_statement_and_share
+      after_create :add_created_statement
 
       # Add some relations
       has_many :record_activities, as: :resource, class_name: 'RecordActivity', dependent: :destroy
@@ -46,7 +46,6 @@ module Enki
       # has_many :shared_with_me, as: :shared_to, class_name: 'ShareModel'
       # to Model:
       # has_many :shared_with, as: :resource, class_name: 'ShareModel'
-
     end
 
       def accessible_through?(user)
@@ -61,10 +60,6 @@ module Enki
         record_activities.where(activity_type: 'Published').order(created_at: :asc).first.try(:actor) || false
       end
 
-#       def record_publisher=(actor)
-#         RecordActivity.where(resource: self, actor: actor, activity_type: 'Published').first_or_create!.actor
-#       end
-  
       def created?
         record_activities.where(activity_type: 'Created').exists?
       end
@@ -73,10 +68,8 @@ module Enki
         record_activities.where(activity_type: 'Created').order(created_at: :asc).first.try(:actor) || false
       end
 
-
-    def add_created_statement_and_share
+    def add_created_statement
       record_activities.create!(resource: self, actor: User.current, activity_type: 'Created')
-      self.share_it(User.current, User.current, true)
     end
 
       

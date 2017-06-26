@@ -17,15 +17,6 @@ end
   #   @subject.record_creator = current_user
 
 
-  # <li id="share_record_creator" class="list-group-item">
-  #   <%= fa_icon('file') %> Created by
-  #   <strong><%= obj.record_activity.creator.name %></strong>
-  # </li>
-
-  #   <%= content_tag :li, id: "share_record_publisher", class: "list-group-item" do %>
-  #     <%= fa_icon('file') %> Published by
-  #     <strong><%= obj.record_activity.publisher.name %></strong>
-  #   <% end if obj.record_publisher %>
   
   # <%= simple_form_for obj, remote: true do |f| %>
   #   <%= f.input :record_publisher, input_html: { value: current_user } %>

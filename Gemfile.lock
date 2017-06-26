@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    enki (0.0.14.alpha)
+    enki (0.0.1.beta)
       rails (~> 5.0.0)
       shareable_models
 

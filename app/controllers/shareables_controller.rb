@@ -61,7 +61,7 @@ class ShareablesController < ApplicationController
     (@filterrific.present? ? @filterrific.find : @model_class).in_batches.each do |records|
       values =[]
       @accessors.each do |accessor|
-        can_edit = @editing_accessors.include?(accessor) ? true : false
+        can_edit = @editing_accessors ? (@editing_accessors.include?(accessor) ? true : false) : false
         acc_hash = accessor.split(' ').map{|a| a.strip }
         acc_instance = acc_hash.last.classify.constantize.find(acc_hash.first)
         values << records.map {|record| "(#{acc_instance.id},'#{acc_instance.class.name}',#{record.id},'#{record.class.base_class.name}',#{current_user.id},'#{current_user.class.name}',#{can_edit},now(),now())" }
@@ -92,6 +92,7 @@ class ShareablesController < ApplicationController
     (@filterrific.present? ? @filterrific.find : @model_class).in_batches.each do |records|
       ShareModel.where(shared_to: @acc_instances, resource_id: records.ids, resource_type: @model_class).delete_all
     end
+
     redirect_to url_for(@model_class), notice: 'Accessors successfully removed.'
   end
 
