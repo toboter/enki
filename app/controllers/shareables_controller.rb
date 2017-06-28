@@ -66,7 +66,7 @@ class ShareablesController < ApplicationController
         acc_instance = acc_hash.last.classify.constantize.find(acc_hash.first)
         values << records.map {|record| "(#{acc_instance.id},'#{acc_instance.class.name}',#{record.id},'#{record.class.base_class.name}',#{current_user.id},'#{current_user.class.name}',#{can_edit},now(),now())" }
       end
-      #raise values.flatten.compact.to_a.join(",").inspect
+      # raise values.flatten.compact.to_a.join(",").inspect
       ActiveRecord::Base.connection.execute("INSERT INTO share_models (shared_to_id, shared_to_type, resource_id, resource_type, shared_from_id, shared_from_type, edit, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")}")
     end
     redirect_to url_for(@model_class), notice: "Successfully shared #{@model_class.name.pluralize}."
