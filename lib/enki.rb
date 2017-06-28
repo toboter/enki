@@ -23,7 +23,7 @@ module Enki
             .where(sharings[:resource_id].eq(resources[:id]).and(sharings[:resource_type].eq(self.base_class.name) )) \
             .where(
               accessors.flatten.map { |accessor|
-                (sharings[:shared_to_id].in(accessor.id.to_i)).to_sql
+                (sharings[:shared_to_id].eq(accessor.id.to_i)).and(sharings[:shared_to_type].eq(accessor.class)).to_sql
               }.join(' OR ')
             )
             .exists
