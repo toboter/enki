@@ -1,5 +1,6 @@
 require 'enki/engine'
 require 'active_support/concern'
+require 'shareable_models'
 
 module Enki
     extend ActiveSupport::Concern
@@ -9,7 +10,7 @@ module Enki
       def is_actable
         true
       end
-    
+
       def accessible_by(user)
         accessors = [user]
         accessors << user.groups.to_a

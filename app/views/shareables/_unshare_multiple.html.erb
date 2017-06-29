@@ -1,0 +1,15 @@
+<div class="clearfix">
+      <%= form_tag unshare_multiple_shareables_path, method: :delete do %>
+        <%= hidden_field_tag 'model_class_name', model %>
+        <% model.filterrific_available_filters.each do |filter| %>
+          <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+        <% end %>
+
+          <% (User.all + Group.all).each do |a| %>
+                <%= check_box_tag 'accessors[]', [a.id, a.class.name] %>
+                <%= a.name %>
+          <% end %>
+
+        <%= submit_tag "Remove", class: 'btn btn-default pull-right' %>
+      <% end %>
+</div>

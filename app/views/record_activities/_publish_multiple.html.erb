@@ -1,0 +1,10 @@
+<strong>Publish records:</strong>
+<%= form_tag publish_multiple_record_activities_path, method: :post do %>
+  <%= hidden_field_tag 'model_class_name', model %>
+  <% model.filterrific_available_filters.each do |filter| %>
+    <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+  <% end %>
+  <%= radio_button_tag 'state', 'publish' %> Publish
+  <%= radio_button_tag 'state', 'unpublish' %> Unpublish
+  <%= submit_tag "Change", class: 'btn btn-default pull-right' %>
+<% end %> 

@@ -21,13 +21,13 @@
 
   <%= content_tag :li, id: "share_record_draft", class: "list-group-item" do %>
     <%= fa_icon('file') %> Draft
-    <%= link_to fa_icon('eye'), publish_record_activities_path(record_to_publish_type: obj.class.name, record_to_publish_id: obj.id), method: :post, class: 'pull-right' %>
+    <%= link_to fa_icon('eye'), record_activity_path(resource_type: obj.class.name), method: :put, class: 'pull-right' %>
   <% end if !obj.published? %>
 
   <%= content_tag :li, id: "share_record_publisher", class: "list-group-item" do %>
     <%= fa_icon('file') %> Published by
     <strong><%= obj.record_publisher.name %></strong>
-    <%= link_to fa_icon('eye-slash'), unpublish_record_activities_path(record_to_publish_type: obj.class.name, record_to_publish_id: obj.id), method: :delete, class: 'pull-right' %>
+    <%= link_to fa_icon('eye-slash'), record_activity_path(resource_type: obj.class.name), method: :delete, class: 'pull-right' %>
   <% end if obj.published? %>
   
 </ul>

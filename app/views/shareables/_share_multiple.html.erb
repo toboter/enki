@@ -1,49 +1,21 @@
-<div class="well" style="margin-top:10px; margin-bottom: 20px;">
-  <div class="row">
-    <div class="col-md-12">
-      <h4>Record access settings</h4>
-      <p class="text-muted">Removing any user from the records will set the record to published.</p>
-    </div>
-    <div class="col-md-6">
-        
-      <%= form_tag add_multiple_shareables_path, method: :put do %>
+<div class="clearfix">
+      <%= form_tag share_multiple_shareables_path, method: :post do %>
         <%= hidden_field_tag 'model_class_name', model %>
         <% model.filterrific_available_filters.each do |filter| %>
           <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
         <% end %>
 
-        <strong>Add access for all displayed records to:</strong>
-        <ul style="padding-left:0;">
+        <ul class="list-group">
           <% (User.all + Group.all).each do |a| %>
-              <li style="list-style-type:none;">
-                <%= check_box_tag 'accessors[]', [a.id, a.class.name] %>
-                <%= a.name %>
-                <small><%= check_box_tag 'can_edit[]', [a.id, a.class.name] %> can edit</small>
+              <li class="list-group-item">
+                <%= a.name.present? ? a.name : "no name given (id: #{a.uid})" %>
+                <span class="pull-right">
+                  <%= check_box_tag 'accessors[]', [a.id, a.class.name] %> share
+                  <small><%= check_box_tag 'can_edit[]', [a.id, a.class.name] %> can edit</small>
+                </span>
               </li>
           <% end %>
         </ul>
-        <%= submit_tag "Add to all", class: 'btn btn-default' %>
+        <%= submit_tag "Add", class: 'btn btn-default pull-right' %>
       <% end %> 
-    </div>
-
-    <div class="col-md-6">
-      <%= form_tag remove_multiple_shareables_path, method: :delete do %>
-        <%= hidden_field_tag 'model_class_name', model %>
-        <% model.filterrific_available_filters.each do |filter| %>
-          <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
-        <% end %>
-        
-        <strong>Remove access to all displayed records from:</strong>
-        <ul style="padding-left:0;">
-          <% (User.all + Group.all).each do |a| %>
-              <li style="list-style-type:none;">
-                <%= check_box_tag 'accessors[]', [a.id, a.class.name] %>
-                <%= a.name %>
-              </li>
-          <% end %>
-        </ul>
-        <%= submit_tag "Remove from all", class: 'btn btn-default' %>
-      <% end %>
-    </div>
-  </div>
 </div>

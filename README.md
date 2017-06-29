@@ -15,3 +15,10 @@ to load the view helper for multisharing on index page
 
 "<%= shared_with(Instance) %>"
 for sharing a single object
+
+
+next steps:
+roles
+record states: created draft(shared_to) review(shared_to says ready) published(by admin)
+notifications send to babili
+adding 'ON CONFLICT DO UPDATE' to insert statement in shareable controller add_multiple

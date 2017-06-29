@@ -1,0 +1,17 @@
+<div class="well" style="margin-top:10px; margin-bottom: 20px;">
+
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Access settings</h4>
+      <p class="text-muted">For all (filtered) records on this Class</p>
+
+      <strong>Share records:</strong>
+      <%= render partial: 'shareables/share_multiple', locals: {model: model} %>
+      <br>
+      <%= render partial: 'shareables/unshare_multiple', locals: {model: model} %>
+
+      <hr>
+      <%= render partial: 'record_activities/publish_multiple', locals: {model: model} %>
+    </div>
+  </div>
+</div>

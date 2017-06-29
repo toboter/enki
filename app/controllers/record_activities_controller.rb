@@ -1,9 +1,8 @@
 class RecordActivitiesController < ApplicationController
   before_action :authorize
+  before_action :set_resource, only: [:update, :destroy]
 
-  def publish
-    @resource = params[:record_to_publish_type].classify.constantize.find(params[:record_to_publish_id])
-
+  def update
     respond_to do |format|
       if !@resource.published? && @resource.record_activities.create(actor: current_user, activity_type: 'Published')
         format.html { redirect_to @resource, notice: 'Resource successfully published.' }
@@ -15,8 +14,7 @@ class RecordActivitiesController < ApplicationController
     end
   end 
 
-  def unpublish
-    @resource = params[:record_to_publish_type].classify.constantize.find(params[:record_to_publish_id])
+  def destroy
     @resource.record_activities.where(activity_type: 'Published').destroy_all
     
     respond_to do |format|
@@ -24,5 +22,38 @@ class RecordActivitiesController < ApplicationController
       format.js
     end
   end 
+
+  def publish_multiple
+    model_class = params[:model_class_name].classify.constantize
+
+    if model_class.respond_to?(:filterrific)
+      filterrific = initialize_filterrific(
+        model_class.visible_for(current_user),
+        params[:filterrific],
+      ) or return
+    end
+
+    (filterrific.present? ? filterrific.find : model_class.visible_for(current_user)).in_batches.each do |records|
+      if params[:state] == 'publish'
+        values = records.map {|record| "(#{record.id},'#{record.class.base_class.name}',#{current_user.id},'Published',now(),now())" }
+        ActiveRecord::Base.connection.execute("INSERT INTO record_activities (resource_id, resource_type, actor_id, \
+          activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")}")  # ON CONFLICT DO UPDATE
+        @state = 'published'
+      elsif params[:state] == 'unpublish'
+        RecordActivity.where(resource_id: records.ids, resource_type: model_class, activity_type: 'Published').delete_all
+        @state = 'unpublished'
+      else
+        @state = 'not on publishing' 
+      end
+    end
+    redirect_to url_for(model_class), notice: "Successfully #{@state} #{model_class.name.pluralize}."
+  end
+
+  private
+
+    def set_resource
+      klass = params[:resource_type].classify.constantize
+      @resource = klass.respond_to?(:friendly) ? klass.friendly.find(params[:id]) : klass.find(params[:id])
+    end
 
 end

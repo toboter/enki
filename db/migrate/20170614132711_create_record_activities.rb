@@ -7,5 +7,6 @@ class CreateRecordActivities < ActiveRecord::Migration[5.0]
 
       t.timestamps
     end
+    add_index :record_activities, [:resource_id, :resource_type, :activity_type], name: 'index_record_activities_on_resource_and_activity', unique: true 
   end
 end

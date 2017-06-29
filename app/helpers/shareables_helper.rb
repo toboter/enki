@@ -4,6 +4,6 @@ module ShareablesHelper
   end
 
   def share_multiple_with(model)
-    render partial: 'shareables/share_multiple', locals: {model: model} # if !obj.published?
+    render partial: 'shared/record_access_settings', locals: {model: model} # if !obj.published?
   end
 end
