@@ -1,4 +1,5 @@
 <div class="clearfix">
+      <strong>Share records:</strong>
       <%= form_tag share_multiple_shareables_path, method: :post do %>
         <%= hidden_field_tag 'model_class_name', model %>
         <% model.filterrific_available_filters.each do |filter| %>
@@ -10,7 +11,7 @@
               <li class="list-group-item">
                 <%= a.name.present? ? a.name : "no name given (id: #{a.uid})" %>
                 <span class="pull-right">
-                  <%= check_box_tag 'accessors[]', [a.id, a.class.name] %> share
+                  <%= check_box_tag 'accessors[]', [a.id, a.class.name] %> read
                   <small><%= check_box_tag 'can_edit[]', [a.id, a.class.name] %> can edit</small>
                 </span>
               </li>

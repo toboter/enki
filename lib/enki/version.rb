@@ -1,3 +1,3 @@
 module Enki
-  VERSION = '0.0.3.beta'
+  VERSION = '0.0.5.beta'
 end

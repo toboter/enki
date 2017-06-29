@@ -9,16 +9,3 @@ class RecordActivity < ApplicationRecord
   end
 
 end
-
-  # belongs_to :record_creator, class_name: 'User'
-  # belongs_to :record_publisher, class_name: 'User'
-
-
-  #   @subject.record_creator = current_user
-
-
-  
-  # <%= simple_form_for obj, remote: true do |f| %>
-  #   <%= f.input :record_publisher, input_html: { value: current_user } %>
-  #   <%= f.submit %>
-  # <% end %>

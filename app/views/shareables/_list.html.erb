@@ -8,7 +8,7 @@
     <%= hidden_field_tag 'resource_id', obj.id %>
     <%= hidden_field_tag 'resource_type', obj.class.name %>
   <%= submit_tag 'Share', class: 'btn btn-primary pull-right' %>
-<% end %>
+<% end if current_user && current_user.can_edit?(obj) %>
 </div>
 
 <ul id="shares" class="list-group">
@@ -21,13 +21,13 @@
 
   <%= content_tag :li, id: "share_record_draft", class: "list-group-item" do %>
     <%= fa_icon('file') %> Draft
-    <%= link_to fa_icon('eye'), record_activity_path(resource_type: obj.class.name), method: :put, class: 'pull-right' %>
+    <%= link_to fa_icon('eye'), record_activity_path(resource_type: obj.class.name), method: :put, class: 'pull-right' if can_publish? %>
   <% end if !obj.published? %>
 
   <%= content_tag :li, id: "share_record_publisher", class: "list-group-item" do %>
     <%= fa_icon('file') %> Published by
     <strong><%= obj.record_publisher.name %></strong>
-    <%= link_to fa_icon('eye-slash'), record_activity_path(resource_type: obj.class.name), method: :delete, class: 'pull-right' %>
+    <%= link_to fa_icon('eye-slash'), record_activity_path(resource_type: obj.class.name), method: :delete, class: 'pull-right' if can_publish? %>
   <% end if obj.published? %>
   
 </ul>

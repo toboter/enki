@@ -114,7 +114,7 @@ module Enki
         record_activities.where(activity_type: 'Created').order(created_at: :asc).first.try(:actor) || false
       end
 
-    def add_created_statement_and_share
+    def add_created_statement
       record_activities.create!(resource: self, actor: User.current, activity_type: 'Created')
       # self.share_it(User.current, User.current, true)
     end
