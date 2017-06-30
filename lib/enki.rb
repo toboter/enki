@@ -11,7 +11,7 @@ module Enki
         true
       end
 
-      def accessible_by(user)
+      def accessible_by_records(user)
         accessors = [user]
         accessors << user.groups.to_a
         # get a reference to the join table
@@ -34,7 +34,7 @@ module Enki
         #   .or(includes(:share_models).where(share_models: {shared_to: accessors.flatten}))
       end
 
-      def inaccessible
+      def inaccessible_records
         sharings = ShareModel.arel_table
         resources = self.base_class.arel_table
         where(
@@ -58,11 +58,11 @@ module Enki
 
       def visible_for(user)
         if user && user.is_admin?
-          where([accessible_by(user), inaccessible, published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
-            .tap {|sc| sc.bind_values = [accessible_by(user), inaccessible, published_records].map(&:bind_values) }
+          where([accessible_by_records(user), inaccessible_records, published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
+            .tap {|sc| sc.bind_values = [accessible_by_records(user), inaccessible_records, published_records].map(&:bind_values) }
         elsif user
-          where([accessible_by(user), published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
-            .tap {|sc| sc.bind_values = [accessible_by(user), published_records].map(&:bind_values) }
+          where([accessible_by_records(user), published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
+            .tap {|sc| sc.bind_values = [accessible_by_records(user), published_records].map(&:bind_values) }
         else
           published_records
         end
@@ -94,10 +94,6 @@ module Enki
       # has_many :shared_with, as: :resource, class_name: 'ShareModel'
     end
 
-      def accessible_through?(user)
-        published? || (user.present? ? (user.in?(record_accessors) || user.is_owner?(self)) : false)
-      end
-
       def published?
         record_activities.where(activity_type: 'Published').exists?
       end
@@ -113,6 +109,15 @@ module Enki
       def record_creator # record_activity.where(activity_type: 'Created').first.actor
         record_activities.where(activity_type: 'Created').order(created_at: :asc).first.try(:actor) || false
       end
+
+      def created_by?(user)
+        record_creator == user
+      end
+
+      def published_by?(user)
+        record_publisher == user
+      end
+
 
     def add_created_statement
       record_activities.create!(resource: self, actor: User.current, activity_type: 'Created')

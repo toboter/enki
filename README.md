@@ -54,12 +54,12 @@ for sharing a single object
 You also get some new methods for the class where Enki is included:
 Class methods:
 * `is_actable` true if included
-* `accessible_by(current_user)` returns all instances shared with the current_user or one of its groups
-* `inaccessible` returns all instances which are not shared
+* `accessible_by_records(current_user)` returns all instances shared with the current_user or one of its groups
+* `inaccessible_records` returns all instances which are not shared
 * `published_records` returns all instances which are published
 * `visible_for(current_user)` combines:
-    `accessible_by(current_user)`, `inaccessible`, `published_records` if current_user.is_admin?
-    `accessible_by(current_user)`, `published_records` if current_user.present?
+    `accessible_by_records(current_user)`, `inaccessible_records`, `published_records` if current_user.is_admin?
+    `accessible_by_records(current_user)`, `published_records` if current_user.present?
     `published_records` if no user is logged in.
 
 Instance methods:
@@ -68,6 +68,8 @@ Instance methods:
 * `record_publisher` gives the publisher User
 * `created?`
 * `record_creator` gives the creator User
+* created_by?(user)
+* published_by?(user)
 
 # Todo
 * roles/abilities
@@ -96,6 +98,7 @@ Importants methods defined by sharer (User or Group).
 
 * `share(resource, to, edit)`: share a resource with another model (to). You can set edit permissions (false by default).
 * `share_with_me(resource, from, edit)`: share a resource **from** another sharer to me. 
+* `can_read?(resource)`: check if a model can read a resource.
 * `can_edit?(resource)`: check if a model can edit a resource.
 * `throw_out(resource, sharer)`: throw out a sharer from a resource.
 * `leave(resource)`: to leave resource. A creator/owner of a shareable resource can't leave it.
@@ -107,6 +110,7 @@ Shareable (where Enki is included) models can be shared between sharers.
 Importants methods defined by sharer (see [shareable.rb](https://github.com/redBorder/shareable_models/blob/master/lib/shareable_models/models/shareable.rb) for full documentation):
 
 * `share_it(from, to, edit)`: share the resource with **from** a model **to** another. You can set edit permissions (false by default).
+* `readable_by?(from)`: check if resource is readable by given model.
 * `editable_by?(from)`: check if resource is editable by given model.
 * `throw_out(from, to)`: a sharer (**from**) throw out another (**to**) from a resource.
 * `leave(sharer)`: sharer leaves resource. A creator/owner of a shareable resource can't leave it.
