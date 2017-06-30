@@ -95,7 +95,7 @@ module Enki
     end
 
       def accessible_through?(user)
-        published? || user.in?(record_accessors) || record_accessors.empty?
+        published? || (user.present? ? (user.in?(record_accessors) || user.is_owner?(self)) : false)
       end
 
       def published?

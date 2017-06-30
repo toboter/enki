@@ -7,7 +7,7 @@
 
           <% (User.all + Group.all).each do |a| %>
                 <%= check_box_tag 'accessors[]', [a.id, a.class.name] %>
-                <%= a.name %>
+                <%= a.name.present? ? a.name : "no name given (id: #{a.uid})" %>
           <% end %>
 
         <%= submit_tag "Remove", class: 'btn btn-default pull-right' %>
