@@ -72,11 +72,10 @@ Instance methods:
 * published_by?(user)
 
 # Todo
-* roles/abilities
 * record states: created draft(shared_to) review(shared_to says ready) published(by admin)
 * notifications send to babili
 * adding 'ON CONFLICT DO UPDATE' to insert statement in shareable controller add_multiple
-
+* undefined method `filterrific_available_filters' for #<Class:0x00000006683c50> Did you mean?  filterrific_find - if defined?
 
 
 
