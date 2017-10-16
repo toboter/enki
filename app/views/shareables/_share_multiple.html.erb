@@ -2,10 +2,13 @@
       <strong>Share records:</strong>
       <%= form_tag share_multiple_shareables_path, method: :post do %>
         <%= hidden_field_tag 'model_class_name', model %>
-        <% model.filterrific_available_filters.each do |filter| %>
-          <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+        <% if model.respond_to?(:filterrific_available_filters) %>
+          <% model.filterrific_available_filters.each do |filter| %>
+            <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+          <% end %>
+        <% else %>
+          <%= hidden_field_tag "search", params[:search] %>
         <% end %>
-
         <ul class="list-group">
           <% (User.all + Group.all).each do |a| %>
               <li class="list-group-item">

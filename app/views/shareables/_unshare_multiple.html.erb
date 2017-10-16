@@ -1,10 +1,13 @@
 <div class="clearfix">
       <%= form_tag unshare_multiple_shareables_path, method: :delete do %>
         <%= hidden_field_tag 'model_class_name', model %>
-        <% model.filterrific_available_filters.each do |filter| %>
-          <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+        <% if model.respond_to?(:filterrific_available_filters) %>
+          <% model.filterrific_available_filters.each do |filter| %>
+            <%= hidden_field_tag "filterrific[#{filter}]", @filterrific.send(filter) %>
+          <% end %>
+        <% else %>
+          <%= hidden_field_tag "search", params[:search] %>
         <% end %>
-
           <% (User.all + Group.all).each do |a| %>
                 <%= check_box_tag 'accessors[]', [a.id, a.class.name] %>
                 <%= a.name.present? ? a.name : "no name given (id: #{a.uid})" %>

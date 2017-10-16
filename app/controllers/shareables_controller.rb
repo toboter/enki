@@ -56,9 +56,16 @@ class ShareablesController < ApplicationController
         model_class.visible_for(current_user),
         params[:filterrific],
       ) or return
+
+      results = filterrific.find
+    elsif model_class.respond_to?(:searchkick)
+      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      results = model_class.where(id: sk_results.map(&:id))
+    else
+      results = model_class.visible_for(current_user)
     end
 
-    (filterrific.present? ? filterrific.find : model_class).in_batches.each do |records|
+    results.in_batches.each do |records|
       @values = []
       accessors.each do |accessor|
         can_edit = editors ? (editors.include?(accessor) ? true : false) : false
@@ -73,14 +80,22 @@ class ShareablesController < ApplicationController
 
   def unshare_multiple
     @accessors = params[:accessors]
-    @model_class = params[:model_class_name].classify.constantize
+    model_class = params[:model_class_name].classify.constantize
 
-    if @model_class.respond_to?(:filterrific)
-      @filterrific = initialize_filterrific(
-        @model_class.visible_for(current_user),
+    if model_class.respond_to?(:filterrific)
+      filterrific = initialize_filterrific(
+        model_class.visible_for(current_user),
         params[:filterrific],
       ) or return
+
+      results = filterrific.find
+    elsif model_class.respond_to?(:searchkick)
+      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      results = model_class.where(id: sk_results.map(&:id))
+    else
+      results = model_class.visible_for(current_user)
     end
+    
 
     @acc_instances =[]
     @accessors.each do |accessor|
@@ -88,11 +103,11 @@ class ShareablesController < ApplicationController
       @acc_instances << acc_hash.last.classify.constantize.find(acc_hash.first)
     end
 
-    (@filterrific.present? ? @filterrific.find : @model_class).in_batches.each do |records|
-      ShareModel.where(shared_to: @acc_instances, resource_id: records.ids, resource_type: @model_class).delete_all
+    results.in_batches.each do |records|
+      ShareModel.where(shared_to: @acc_instances, resource_id: records.ids, resource_type: model_class.name).delete_all
     end
 
-    redirect_to url_for(@model_class), notice: 'Accessors successfully removed.'
+    redirect_to url_for(model_class), notice: 'Accessors successfully removed.'
   end
 
   private

@@ -31,16 +31,23 @@ class RecordActivitiesController < ApplicationController
         model_class.visible_for(current_user),
         params[:filterrific],
       ) or return
+
+      results = filterrific.find
+    elsif model_class.respond_to?(:searchkick)
+      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      results = model_class.where(id: sk_results.map(&:id))
+    else
+      results = model_class.visible_for(current_user)
     end
 
-    (filterrific.present? ? filterrific.find : model_class.visible_for(current_user)).in_batches.each do |records|
+    results.in_batches.each do |records|
       if params[:state] == 'publish'
         values = records.map {|record| "(#{record.id},'#{record.class.base_class.name}',#{current_user.id},'Published',now(),now())" }
         ActiveRecord::Base.connection.execute("INSERT INTO record_activities (resource_id, resource_type, actor_id, \
           activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")}")  # ON CONFLICT DO UPDATE
         @state = 'published'
       elsif params[:state] == 'unpublish'
-        RecordActivity.where(resource_id: records.ids, resource_type: model_class, activity_type: 'Published').delete_all
+        RecordActivity.where(resource_id: records.ids, resource_type: model_class.name, activity_type: 'Published').delete_all
         @state = 'unpublished'
       else
         @state = 'not on publishing' 
