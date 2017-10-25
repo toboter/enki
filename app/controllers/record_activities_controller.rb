@@ -44,7 +44,7 @@ class RecordActivitiesController < ApplicationController
       if params[:state] == 'publish'
         values = records.map {|record| "(#{record.id},'#{record.class.base_class.name}',#{current_user.id},'Published',now(),now())" }
         ActiveRecord::Base.connection.execute("INSERT INTO record_activities (resource_id, resource_type, actor_id, \
-          activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")}")  # ON CONFLICT DO UPDATE
+          activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")} ON CONFLICT (resource_id, resource_type, shared_to_id, shared_to_type) DO NOTHING")  # ON CONFLICT DO UPDATE
         @state = 'published'
       elsif params[:state] == 'unpublish'
         RecordActivity.where(resource_id: records.ids, resource_type: model_class.name, activity_type: 'Published').delete_all

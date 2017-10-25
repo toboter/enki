@@ -73,7 +73,7 @@ class ShareablesController < ApplicationController
       end
 
       ActiveRecord::Base.connection.execute("INSERT INTO share_models (shared_to_id, shared_to_type, resource_id, resource_type, \
-        shared_from_id, shared_from_type, edit, created_at, updated_at) VALUES #{@values.flatten.compact.to_a.join(",")}") # ON CONFLICT DO UPDATE
+        shared_from_id, shared_from_type, edit, created_at, updated_at) VALUES #{@values.flatten.compact.to_a.join(",")} ON CONFLICT (resource_id, resource_type, shared_to_id, shared_to_type) DO NOTHING") # ON CONFLICT DO UPDATE
     end
     redirect_to url_for(model_class), notice: "Successfully shared #{model_class.name.pluralize}."
   end
