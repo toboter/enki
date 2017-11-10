@@ -44,6 +44,19 @@ module Enki
         )
       end
 
+      def creator_records(user)
+        activities = RecordActivity.arel_table
+        resources = self.base_class.arel_table
+        where(
+          RecordActivity \
+            .where(activities[:resource_id].eq(resources[:id]) \
+              .and(activities[:resource_type].eq(self.base_class.name)) \
+              .and(activities[:activity_type].eq('Created')) \
+              .and(activities[:actor_id].eq(user.id.to_i)) ) \
+            .exists
+        )
+      end
+
       def published_records
         activities = RecordActivity.arel_table
         resources = self.base_class.arel_table
@@ -61,8 +74,8 @@ module Enki
           where([accessible_by_records(user), inaccessible_records, published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
             .tap {|sc| sc.bind_values = [accessible_by_records(user), inaccessible_records, published_records].map(&:bind_values) }
         elsif user
-          where([accessible_by_records(user), published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
-            .tap {|sc| sc.bind_values = [accessible_by_records(user), published_records].map(&:bind_values) }
+          where([accessible_by_records(user), creator_records(user), published_records].map{|s| s.arel.constraints.reduce(:and) }.reduce(:or)) \
+            .tap {|sc| sc.bind_values = [accessible_by_records(user), creator_records(user), published_records].map(&:bind_values) }
         else
           published_records
         end
