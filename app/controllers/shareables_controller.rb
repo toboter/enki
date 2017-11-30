@@ -59,8 +59,22 @@ class ShareablesController < ApplicationController
 
       results = filterrific.find
     elsif model_class.respond_to?(:searchkick)
-      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      records = model_class.visible_for(current_user).all
+      query = params[:search].presence || '*'
+      if model_class.respond_to?(:filter)
+        records = records.filter(params.slice(:with_user_shared_to_like, :with_unshared_records, :with_published_records))
+      end
+
+      sk_results = model_class.search(query, 
+        where: { id: records.ids },
+        per_page: 10000 ,
+        misspellings: {below: 1}
+        ) do |body|
+          body[:query][:bool][:must] = { query_string: { query: query, default_operator: "and" } }
+        end
+
       results = model_class.where(id: sk_results.map(&:id))
+
     else
       results = model_class.visible_for(current_user)
     end
@@ -90,8 +104,22 @@ class ShareablesController < ApplicationController
 
       results = filterrific.find
     elsif model_class.respond_to?(:searchkick)
-      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      records = model_class.visible_for(current_user).all
+      query = params[:search].presence || '*'
+      if model_class.respond_to?(:filter)
+        records = records.filter(params.slice(:with_user_shared_to_like, :with_unshared_records, :with_published_records))
+      end
+
+      sk_results = model_class.search(query, 
+        where: { id: records.ids },
+        per_page: 10000 ,
+        misspellings: {below: 1}
+        ) do |body|
+          body[:query][:bool][:must] = { query_string: { query: query, default_operator: "and" } }
+        end
+
       results = model_class.where(id: sk_results.map(&:id))
+
     else
       results = model_class.visible_for(current_user)
     end

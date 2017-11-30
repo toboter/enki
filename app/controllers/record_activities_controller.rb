@@ -34,8 +34,22 @@ class RecordActivitiesController < ApplicationController
 
       results = filterrific.find
     elsif model_class.respond_to?(:searchkick)
-      sk_results = model_class.visible_for(current_user).search (params[:search].presence || '*')
+      records = model_class.visible_for(current_user).all
+      query = params[:search].presence || '*'
+      if model_class.respond_to?(:filter)
+        records = records.filter(params.slice(:with_user_shared_to_like, :with_unshared_records, :with_published_records))
+      end
+
+      sk_results = model_class.search(query, 
+        where: { id: records.ids },
+        per_page: 10000 ,
+        misspellings: {below: 1}
+        ) do |body|
+          body[:query][:bool][:must] = { query_string: { query: query, default_operator: "and" } }
+        end
+
       results = model_class.where(id: sk_results.map(&:id))
+
     else
       results = model_class.visible_for(current_user)
     end
@@ -44,7 +58,7 @@ class RecordActivitiesController < ApplicationController
       if params[:state] == 'publish'
         values = records.map {|record| "(#{record.id},'#{record.class.base_class.name}',#{current_user.id},'Published',now(),now())" }
         ActiveRecord::Base.connection.execute("INSERT INTO record_activities (resource_id, resource_type, actor_id, \
-          activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")} ON CONFLICT (resource_id, resource_type, shared_to_id, shared_to_type) DO NOTHING")  # ON CONFLICT DO UPDATE
+          activity_type, created_at, updated_at) VALUES #{values.flatten.compact.to_a.join(",")} ON CONFLICT (resource_id, resource_type, activity_type) DO NOTHING")  # ON CONFLICT DO UPDATE
         @state = 'published'
       elsif params[:state] == 'unpublish'
         RecordActivity.where(resource_id: records.ids, resource_type: model_class.name, activity_type: 'Published').delete_all
